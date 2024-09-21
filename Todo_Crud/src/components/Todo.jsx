@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import './Todo.css'; // Import the external CSS file
+import './Todo.css'; 
 
-// Get todos from localStorage
 const getLocalItems = () => {
   let list = localStorage.getItem('list');
   if (list) {
