@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './App.css'; // Import your CSS file
+import './App.css'; 
 
 function App() {
     const [avatars, setAvatars] = useState(JSON.parse(localStorage.getItem('avatars')) || []);
