@@ -5,7 +5,7 @@ import ProductList from "./ProductList";
 
 const Product = () => {
   const [data, setData] = useState([]);
-  const { id } = useParams(); 
+//   const { id } = useParams(); 
 
   useEffect(() => {
     async function fetch() {
@@ -17,7 +17,7 @@ const Product = () => {
 
   return (
     <div>
-      {!id && <ProductList data={data} />}
+      {<ProductList data={data} />}
       <Outlet />
     </div>
   );
