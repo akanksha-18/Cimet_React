@@ -7,7 +7,7 @@ import CurrencySelector from '../components/CurrencySelector';
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();  
   const { formatPrice } = useCurrency(); 
 
   useEffect(() => {
@@ -40,19 +40,26 @@ const Products = () => {
         <CurrencySelector />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {products.map((product) => (
-          <div key={product.id} className="border p-4 rounded-lg">
-            <img src={product.image} alt={product.title} className="w-full h-48 object-contain mb-4" />
-            <h3 className="text-lg font-semibold">{product.title}</h3>
-            <p className="text-gray-600">{formatPrice(product.price)}</p> 
-            <button
-              onClick={() => addToCart(product)}
-              className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Add to Cart
-            </button>
-          </div>
-        ))}
+        {products.map((product) => {
+          // Check if the product is already in the cart
+          const isInCart = cartItems.some((item) => item.id === product.id);
+          return (
+            <div key={product.id} className="border p-4 rounded-lg">
+              <img src={product.image} alt={product.title} className="w-full h-48 object-contain mb-4" />
+              <h3 className="text-lg font-semibold">{product.title}</h3>
+              <p className="text-gray-600">{formatPrice(product.price)}</p>
+              <button
+                onClick={() => addToCart(product)}
+                className={`mt-2 px-4 py-2 rounded ${
+                  isInCart ? 'bg-gray-400 text-white cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+                disabled={isInCart}  
+              >
+                {isInCart ? 'Already in Cart' : 'Add to Cart'}
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
