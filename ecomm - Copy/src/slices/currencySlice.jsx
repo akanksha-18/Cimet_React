@@ -32,8 +32,16 @@ const currencySlice = createSlice({
 export const { setCurrency } = currencySlice.actions;
 export default currencySlice.reducer;
 
-export const convertPrice = (priceInUSD, { currency, exchangeRates }) => {
+// export const convertPrice = (priceInUSD, { currency, exchangeRates }) => {
+//   if (currency === 'USD') return priceInUSD;
+//   if (!exchangeRates[currency]) return priceInUSD;
+//   return (priceInUSD * exchangeRates[currency]).toFixed(2);
+// };
+
+// src/slices/currencySlice.jsx
+
+export const convertPrice = (priceInUSD, currency = 'USD', exchangeRates = {}) => {
   if (currency === 'USD') return priceInUSD;
-  if (!exchangeRates[currency]) return priceInUSD;
-  return (priceInUSD * exchangeRates[currency]).toFixed(2);
+  if (!exchangeRates[currency]) return priceInUSD; // Return the price in USD if the exchange rate is not available
+  return (priceInUSD * exchangeRates[currency]).toFixed(2); // Convert the price based on the exchange rate
 };
