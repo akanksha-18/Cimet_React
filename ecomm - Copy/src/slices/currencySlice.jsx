@@ -1,13 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-export const fetchExchangeRates = createAsyncThunk(
-  'currency/fetchExchangeRates',
-  async () => {
-    const response = await axios.get('https://open.er-api.com/v6/latest/USD');
-    return response.data.rates;
-  }
-);
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   currency: 'USD',
@@ -21,27 +12,18 @@ const currencySlice = createSlice({
     setCurrency: (state, action) => {
       state.currency = action.payload;
     },
-  },
-  extraReducers: (builder) => {
-    builder.addCase(fetchExchangeRates.fulfilled, (state, action) => {
+    setExchangeRates: (state, action) => {
       state.exchangeRates = action.payload;
-    });
+    },
   },
 });
 
-export const { setCurrency } = currencySlice.actions;
+export const { setCurrency, setExchangeRates } = currencySlice.actions;
 export default currencySlice.reducer;
 
-// export const convertPrice = (priceInUSD, { currency, exchangeRates }) => {
-//   if (currency === 'USD') return priceInUSD;
-//   if (!exchangeRates[currency]) return priceInUSD;
-//   return (priceInUSD * exchangeRates[currency]).toFixed(2);
-// };
-
-// src/slices/currencySlice.jsx
-
+// Conversion function
 export const convertPrice = (priceInUSD, currency = 'USD', exchangeRates = {}) => {
   if (currency === 'USD') return priceInUSD;
-  if (!exchangeRates[currency]) return priceInUSD; // Return the price in USD if the exchange rate is not available
-  return (priceInUSD * exchangeRates[currency]).toFixed(2); // Convert the price based on the exchange rate
+  if (!exchangeRates[currency]) return priceInUSD;
+  return (priceInUSD * exchangeRates[currency]).toFixed(2);
 };
