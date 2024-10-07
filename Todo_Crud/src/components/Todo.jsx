@@ -1,96 +1,71 @@
-import React, { useEffect, useState } from 'react';
-import './Todo.css'; 
-
-const getLocalItems = () => {
-  let list = localStorage.getItem('list');
-  if (list) {
-    return JSON.parse(list);
-  }
-  return [];
-};
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setNewTodo, addTodo, deleteTodo, toggleTodo, setEditingTodoId, updateTodo, setEditingTitle } from '../slices/TodoSlice';
 
 const Todo = () => {
-  const [Todo, setTodo] = useState('');
-  const [list, setList] = useState(getLocalItems());
-  const [isEditing, setIsEditing] = useState(false);
-  const [editIndex, setEditIndex] = useState(null);
+  const todos = useSelector((state) => state.todos.todos);
+  const newTodo = useSelector((state) => state.todos.newTodo);
+  const editingTodoId = useSelector((state) => state.todos.editingTodoId); 
+  const editingTitle = useSelector((state) => state.todos.editingTitle);   
+  const dispatch = useDispatch();
 
-  const changeText = (e) => {
-    setTodo(e.target.value);
+  const handleAddTodo = () => {
+    dispatch(addTodo()); 
   };
 
-  const addTodo = () => {
-    if (!Todo.trim()) return;
-    if (isEditing) {
-      const updatedList = list.map((item, index) =>
-        index === editIndex ? { ...item, text: Todo } : item
-      );
-      setList(updatedList);
-      setIsEditing(false);
-      setEditIndex(null);
-    } else {
-      setList([...list, { text: Todo, completed: false }]);
-    }
-    setTodo('');
+  const handleEditTodo = (id) => {
+    dispatch(setEditingTodoId(id)); 
   };
 
-  const editTask = (index) => {
-    setTodo(list[index].text);
-    setIsEditing(true);
-    setEditIndex(index);
+  const handleSaveTodo = () => {
+    dispatch(updateTodo());
   };
 
-  const removeTask = (index) => {
-    const newList = list.filter((_, i) => i !== index);
-    setList(newList);
+  const handleToggleTodo = (id) => {
+    dispatch(toggleTodo(id)); 
   };
-
-  const completeTask = (index) => {
-    const updatedList = list.map((item, i) =>
-      i === index ? { ...item, completed: !item.completed } : item
-    );
-    setList(updatedList);
-  };
-
-  useEffect(() => {
-    localStorage.setItem('list', JSON.stringify(list));
-  }, [list]);
 
   return (
-    <div className="container">
-      <h1 className="todo-header">Todo App</h1>
+    <div>
       <input
         type="text"
-        className="todo-input"
-        placeholder="Enter your todos"
-        value={Todo}
-        onChange={changeText}
+        value={newTodo}  
+        onChange={(e) => dispatch(setNewTodo(e.target.value))} 
+        placeholder="Add a new todo"
       />
-      <button className="todo-button" onClick={addTodo}>
-        {isEditing ? 'Update' : 'Add'}
-      </button>
+      <button onClick={handleAddTodo}>Add Todo</button>
 
-      {list.length > 0 ? (
-        <ul className="todo-list">
-          {list.map((item, index) => (
-            <li
-              key={index}
-              className={`todo-item ${item.completed ? 'completed' : ''}`}
-            >
-              <span>{item.text}</span>
-              <div>
-                <button onClick={() => completeTask(index)}>
-                  {item.completed ? 'Undo' : 'Complete'}
-                </button>
-                <button onClick={() => editTask(index)}>Edit</button>
-                <button onClick={() => removeTask(index)}>Delete</button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No todos available</p>
-      )}
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            {editingTodoId === todo.id ? (
+              <>
+                
+                <input
+                  type="text"
+                  value={editingTitle} 
+                  onChange={(e) => dispatch(setEditingTitle(e.target.value))} 
+                />
+                <button onClick={handleSaveTodo}>Save</button>
+              </>
+            ) : (
+              <>
+                
+                <span style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>
+                  {todo.title}
+                </span>
+                <button onClick={() => handleEditTodo(todo.id)} disabled={todo.completed}>Edit</button>
+                <button onClick={() => dispatch(deleteTodo(todo.id))}>Delete</button>
+                <input
+                  type="checkbox"
+                  checked={todo.completed}
+                  onChange={() => handleToggleTodo(todo.id)}
+                />
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
